@@ -6,12 +6,25 @@
     </li>
     <li class="sidebar-item">
       <a class="sidebar-link" href="{{ url('/tournament') }}" aria-expanded="false">
-        <i class="ti ti-atom"></i>
-        <span class="hide-menu">Tournament Type</span>
+        <i class="ti ti-tournament"></i>
+        <span class="hide-menu">Add Tournament Type</span>
       </a>
     </li>
 
+        <li class="sidebar-item">
+      <a class="sidebar-link" href="{{ url('/tournamentMode') }}" aria-expanded="false">
+        <i class="ti ti-tournament"></i>
+        <span class="hide-menu">Add Tournament Mode</span>
+      </a>
+    </li>
     <li class="sidebar-item">
+        <a class="sidebar-link" href="{{ url('/createTournament') }}" aria-expanded="false">
+            <i class="ti ti-trophy"></i>
+            <span class="hide-menu">Create Tournament</span>
+        </a>
+        </li>
+
+    {{-- <li class="sidebar-item">
       <a class="sidebar-link justify-content-between" href="{{ url('/analytics') }}" aria-expanded="false">
         <div class="d-flex align-items-center gap-3">
           <span class="d-flex"><i class="ti ti-aperture"></i></span>
@@ -103,6 +116,6 @@
           <span class="hide-menu">User Profile</span>
         </div>
       </a>
-    </li>
+    </li> --}}
   </ul>
 </nav>
