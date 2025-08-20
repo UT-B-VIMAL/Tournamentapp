@@ -6,14 +6,14 @@
     </li>
     <li class="sidebar-item">
       <a class="sidebar-link" href="{{ url('/tournament') }}" aria-expanded="false">
-        <i class="ti ti-tournament"></i>
+        <i class="ti ti-category"></i>
         <span class="hide-menu">Add Tournament Type</span>
       </a>
     </li>
 
         <li class="sidebar-item">
       <a class="sidebar-link" href="{{ url('/tournamentMode') }}" aria-expanded="false">
-        <i class="ti ti-tournament"></i>
+        <i class="ti ti-adjustments-alt"></i>
         <span class="hide-menu">Add Tournament Mode</span>
       </a>
     </li>
