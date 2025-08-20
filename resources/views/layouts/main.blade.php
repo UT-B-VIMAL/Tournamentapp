@@ -26,9 +26,9 @@
             <i class="ti ti-x fs-6"></i>
           </div>
         </div>
-      
+
          @include('layouts.sidebar')
-       
+
       </div>
     </aside>
     <!--  Sidebar End -->
