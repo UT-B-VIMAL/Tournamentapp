@@ -6,10 +6,6 @@
               </a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link " href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="ti ti-bell"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
               <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
                 <div class="message-body">
                   <a href="javascript:void(0)" class="dropdown-item">
