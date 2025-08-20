@@ -13,9 +13,7 @@
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
 
-    {{-- header --}}
-    @include('layouts.header')
-    {{-- header --}}
+
 
     <!-- Sidebar Start -->
     <aside class="left-sidebar">
@@ -38,7 +36,7 @@
     <!--  Main wrapper -->
     <div class="body-wrapper">
       <header class="app-header">
-        @include('layouts.subheader')
+        @include('layouts.header')
       </header>
       <div class="body-wrapper-inner">
         <div class="container-fluid">
