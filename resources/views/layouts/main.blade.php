@@ -14,7 +14,6 @@
         data-sidebar-position="fixed" data-header-position="fixed">
 
 
-
     <!-- Sidebar Start -->
     <aside class="left-sidebar">
       <div>
