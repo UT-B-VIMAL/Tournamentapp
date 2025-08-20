@@ -44,7 +44,6 @@
         <div class="mb-3">
           <label for="typeLabel" class="form-label">Type label</label>
           <input type="text" class="form-control" id="typeLabel" placeholder="Enter type label">
-          <div class="form-text">Give the type</div>
         </div>
         
         <h5 class="fw-semibold mb-3">Variables</h5>
@@ -67,17 +66,17 @@
                 </select>
               </div>
               <div class="col-md-2">
-                <button type="button" class="btn btn-danger remove-btn d-none">Remove -</button>
+                <button type="button" class="btn btn-danger remove-btn">Remove -</button>
               </div>
             </div>
             <div class="subfields d-none mt-3">
               <div class="subfield-list"></div>
-              <button type="button" class="btn btn-sm btn-primary mt-2 add-subfield">Add Subfield +</button>
+              <button type="button" class="btn btn-sm btn-primary mt-2 add-subfield">Add +</button>
             </div>
           </div>
         </div>
         
-        <button type="button" class="btn btn-success mt-3" id="addVariable">Add Variable +</button>
+        <button type="button" class="btn btn-success mt-3" id="addVariable">Add +</button>
         <button type="submit" class="btn btn-primary mt-3">Submit</button>
       </form>
     </div>
@@ -114,7 +113,7 @@ $(document).ready(function(){
         </div>
         <div class="subfields d-none mt-3">
           <div class="subfield-list"></div>
-          <button type="button" class="btn btn-sm btn-primary mt-2 add-subfield">Add Subfield +</button>
+          <button type="button" class="btn btn-sm btn-primary mt-2 add-subfield">Add +</button>
         </div>
       </div>`;
   }
@@ -138,7 +137,7 @@ $(document).ready(function(){
           </select>
         </div>
         <div class="col-md-2">
-          <button type="button" class="btn btn-sm btn-danger remove-subfield">X</button>
+          <button type="button" class="btn btn-sm btn-danger remove-subfield">Remove -</button>
         </div>
       </div>`;
   }
