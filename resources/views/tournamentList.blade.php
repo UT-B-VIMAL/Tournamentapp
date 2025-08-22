@@ -122,14 +122,10 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="card-title fw-semibold mb-0">Tournaments</h5>
-
-                <!-- Add Button (Top Right) -->
                 <a href="{{ url('/createTournament') }}" class="btn add-btn">
                     <i class="fa-solid fa-plus"></i> Add Tournament
                 </a>
             </div>
-
-
 
             <div class="table-responsive">
                 <table id="tournamentTable" class="table nowrap" style="width:100%">
@@ -138,40 +134,19 @@
                             <th>ID</th>
                             <th>Type Label</th>
                             <th>Variables</th>
-                            <th>Created At</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Knockout</td>
-                            <td>Players, Rounds</td>
-                            <td>2025-08-22</td>
-                            <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View"></i>
-                                <i class="fa-solid fa-pen-to-square" title="Edit"></i>
-                                <i class="fa-solid fa-trash" title="Delete"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>League</td>
-                            <td>Teams, Matches</td>
-                            <td>2025-08-21</td>
-                            <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View"></i>
-                                <i class="fa-solid fa-pen-to-square" title="Edit"></i>
-                                <i class="fa-solid fa-trash" title="Delete"></i>
-                            </td>
-                        </tr>
+                    <tbody id="tournamentBody">
+                        <!-- Fetched data will go here -->
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 @endsection
+
 
 @section('scripts')
     <!-- jQuery + DataTables JS -->
@@ -182,21 +157,64 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#tournamentTable').DataTable({
+        $(document).ready(function () {
+            const table = $('#tournamentTable').DataTable({
                 responsive: true,
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
             });
 
-            // Example action handlers
-            $(document).on("click", ".fa-eye", function() {
-                alert("View clicked!");
-            });
-            $(document).on("click", ".fa-pen-to-square", function() {
-                alert("Edit clicked!");
-            });
-            $(document).on("click", ".fa-trash", function() {
+            async function loadTournaments() {
+                
+                const tbody = document.getElementById("tournamentBody");
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center">Loading...</td></tr>`;
+
+                try {
+                   
+                    const response = await apiRequest("", "POST", { request_type: "get_tournament_type" });
+
+                    if (response.code === 200) {
+                        let tournaments = JSON.parse(response.data);
+                        tbody.innerHTML = "";
+
+                        tournaments.forEach(t => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${t.id}</td>
+                                    <td>${t.name}</td>
+                                    <td><pre class="mb-0">${t.variables || '-'}</pre></td>
+                                    <td>${t.status == 0 ? 'Inactive' : 'Active'}</td>
+                                    <td class="table-actions">
+                                        <i class="fa-solid fa-eye text-primary" title="View"></i>
+                                        <i class="fa-solid fa-pen-to-square text-warning" title="Edit"></i>
+                                        <i class="fa-solid fa-trash text-danger" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+
+                        // Refresh DataTable
+                        table.clear().destroy();
+                        $('#tournamentTable').DataTable({
+                            responsive: true,
+                            pageLength: 5,
+                            lengthMenu: [5, 10, 25, 50],
+                        });
+                    }
+                } catch (err) {
+                    console.error("Error fetching tournaments:", err);
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" class="text-center text-danger">Failed to load data</td></tr>`;
+                }
+            }
+
+            // Load tournaments on page load
+            loadTournaments();
+
+            // Action handlers
+            $(document).on("click", ".fa-eye", () => alert("View clicked!"));
+            $(document).on("click", ".fa-pen-to-square", () => alert("Edit clicked!"));
+            $(document).on("click", ".fa-trash", () => {
                 if (confirm("Are you sure you want to delete this?")) {
                     alert("Deleted!");
                 }
@@ -204,5 +222,3 @@
         });
     </script>
 @endsection
-
-
