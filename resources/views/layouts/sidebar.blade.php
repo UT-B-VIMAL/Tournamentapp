@@ -5,22 +5,22 @@
             <span class="hide-menu">Home</span>
         </li>
     <li class="sidebar-item">
-      <a class="sidebar-link @if (request()->is('tournament', 'tournamenttypelist')) active @endif" href="{{ url('/tournamenttypelist') }}" aria-expanded="false">
+      <a class="sidebar-link @if (request()->is('tournament', 'tournamenttypelist','edit-tournament')) active @endif" href="{{ url('/tournamenttypelist') }}" aria-expanded="false">
         <i class="ti ti-category"></i>
         <span class="hide-menu">Tournament Types</span>
       </a>
     </li>
 
         <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ url('/tournamentMode') }}" aria-expanded="false">
+            <a class="sidebar-link @if (request()->is( 'tournamentmodeList','tournamentMode')) active @endif" href="{{ url('/tournamentmodeList') }}" aria-expanded="false">
                 <i class="ti ti-adjustments-alt"></i>
-                <span class="hide-menu">Add Tournament Mode</span>
+                <span class="hide-menu">Tournament Modes</span>
             </a>
         </li>
         <li class="sidebar-item">
-            <a class="sidebar-link" href="{{ url('/createTournament') }}" aria-expanded="false">
+            <a class="sidebar-link @if (request()->is( 'tournamentlist','createTournament')) active @endif" href="{{ url('/tournamentlist') }}" aria-expanded="false">
                 <i class="ti ti-trophy"></i>
-                <span class="hide-menu">Create Tournament</span>
+                <span class="hide-menu">Tournaments</span>
             </a>
         </li>
 

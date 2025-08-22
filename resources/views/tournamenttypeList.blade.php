@@ -47,7 +47,19 @@
             transition: 0.3s;
         }
 
-        /* Action Icons */
+        table#tournamentlistTable td:nth-child(3) pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow: visible;
+            margin: 0;
+            max-width: 100%;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+
         .table-actions {
             display: flex;
             gap: 12px;
@@ -132,13 +144,12 @@
 
 
             <div class="table-responsive">
-                <table id="tournamentlistTable" class="table nowrap" style="width:100%">
+                <table id="tournamentlistTable" class="table nowrap">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Type</th>
                             <th>Variables</th>
-
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -195,16 +206,9 @@
 
     <script>
         $(document).ready(function() {
-            $('#tournamentlistTable').DataTable({
-                responsive: true,
-                pageLength: 5,
-                lengthMenu: [5, 10, 25, 50],
-            });
-
             async function loadTournamentTypes() {
                 const tbody = document.querySelector("#tournamentlistTable tbody");
 
-                // show loader while fetching
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center">Loading...</td></tr>`;
 
                 try {
@@ -213,13 +217,20 @@
                     });
 
                     if (response.code === 200 && response.data) {
-                        const tournaments = JSON.parse(response.data); // API gives stringified JSON
-
-                        tbody.innerHTML = ""; // clear previous rows
+                        const tournaments = JSON.parse(response.data); // parse outer array
+                        tbody.innerHTML = "";
 
                         tournaments.forEach(t => {
-                            let variables = t.variables ? `<pre class="mb-0">${t.variables}</pre>` :
-                                "-";
+                            let variables = "-";
+                            if (t.variables) {
+                                try {
+                                    const varsObj = JSON.parse(t.variables); // parse inner JSON
+                                    variables =
+                                        `<pre class="mb-0">${JSON.stringify(varsObj, null, 2)}</pre>`; // pretty-print
+                                } catch (e) {
+                                    variables = `<pre class="mb-0">${t.variables}</pre>`; // fallback
+                                }
+                            }
 
                             let row = `
                     <tr>
@@ -236,6 +247,19 @@
 
                             tbody.insertAdjacentHTML("beforeend", row);
                         });
+
+                        $('#tournamentlistTable').DataTable({
+                            responsive: true,
+                            pageLength: 5,
+                            lengthMenu: [5, 10, 25, 50],
+                            destroy: true 
+                            // columnDefs: [{
+                            //         targets: 2,
+                            //         width: '50%'
+                            //     } 
+                            //]
+                        });
+
                     } else {
                         tbody.innerHTML =
                             `<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>`;
@@ -246,6 +270,7 @@
                         `<tr><td colspan="5" class="text-center text-danger">Failed to fetch data</td></tr>`;
                 }
             }
+
 
 
             // Load tournaments on page load
