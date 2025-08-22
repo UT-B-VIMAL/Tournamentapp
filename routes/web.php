@@ -17,7 +17,7 @@ Route::get('/tournamenttypelist', function () {
     return view('tournamenttypeList');
 });
 Route::get('/tournamentMode', function () {
-    return view('tournamentMode');
+    return view('create_tournament_mode');
 });
 Route::get('/tournamentmodeList', function () {
     return view('tournamentmodeList');
@@ -27,4 +27,7 @@ Route::get('/createTournament', function () {
 });
 Route::get('/tournamentlist', function () {
     return view('tournamentList');
+});
+Route::get('/edit-tournament-mode/{id}', function ($id) {
+    return view('edit_tournament_mode', ['id' => $id]);
 });
