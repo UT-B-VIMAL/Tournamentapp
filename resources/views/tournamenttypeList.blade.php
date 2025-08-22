@@ -136,37 +136,14 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Type Label</th>
+                            <th>Type</th>
                             <th>Variables</th>
-                            <th>Created At</th>
+
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Knockout</td>
-                            <td>Players, Rounds</td>
-                            <td>2025-08-22</td>
-                            <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal"
-                                    data-bs-target="#viewModal"></i>
-                                <i class="fa-solid fa-pen-to-square" title="Edit"></i>
-                                <i class="fa-solid fa-trash" title="Delete"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>League</td>
-                            <td>Teams, Matches</td>
-                            <td>2025-08-21</td>
-                            <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal"
-                                    data-bs-target="#viewModal"></i>
-                                <i class="fa-solid fa-pen-to-square" title="Edit"></i>
-                                <i class="fa-solid fa-trash" title="Delete"></i>
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -242,18 +219,17 @@
 
                         tournaments.forEach(t => {
                             let variables = t.variables ? `<pre class="mb-0">${t.variables}</pre>` :
-                            "-";
+                                "-";
 
                             let row = `
                     <tr>
                         <td>${t.id}</td>
                         <td>${t.name}</td>
                         <td>${variables}</td>
-                        <td>${t.created_at ?? '-'}</td>
                         <td class="table-actions">
                             <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
-                            <i class="fa-solid fa-pen-to-square" title="Edit"></i>
-                            <i class="fa-solid fa-trash" title="Delete"></i>
+                            <i class="fa-solid fa-pen-to-square edit-icon" title="Edit" data-id="${t.id}"></i>
+                            <i class="fa-solid fa-trash" title="Delete" data-id="${t.id}"></i>
                         </td>
                     </tr>
                 `;
@@ -274,6 +250,11 @@
 
             // Load tournaments on page load
             loadTournamentTypes();
+
+            $(document).on("click", ".edit-icon", function() {
+                let id = $(this).data("id");
+                window.location.href = `/edit-tournament?id=${id}`;
+            });
 
             $(document).on("click", ".fa-trash", function() {
                 Swal.fire({
