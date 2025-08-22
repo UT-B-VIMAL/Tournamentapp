@@ -132,8 +132,12 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Type Label</th>
-                            <th>Variables</th>
+                            <th>Name</th>
+                            <th>Tournament Mode</th>
+                            <th>Entry Fee</th>
+                            <th>Started At</th>
+                            <th>Closed At</th>
+                            <th>Result At</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -162,52 +166,69 @@
                 responsive: true,
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
+
             });
 
-            async function loadTournaments() {
-                
-                const tbody = document.getElementById("tournamentBody");
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center">Loading...</td></tr>`;
+           async function loadTournaments() {
+        try {
+            const response = await apiRequest("", "POST", { request_type: "get_tournament" });
 
-                try {
-                   
-                    const response = await apiRequest("", "POST", { request_type: "get_tournament_type" });
+            if (response.code === 200) {
+                let tournaments = JSON.parse(response.data);
 
-                    if (response.code === 200) {
-                        let tournaments = JSON.parse(response.data);
-                        tbody.innerHTML = "";
+                // Clear old rows
+                table.clear();
 
-                        tournaments.forEach(t => {
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td>${t.id}</td>
-                                    <td>${t.name}</td>
-                                    <td><pre class="mb-0">${t.variables || '-'}</pre></td>
-                                    <td>${t.status == 0 ? 'Inactive' : 'Active'}</td>
-                                    <td class="table-actions">
-                                        <i class="fa-solid fa-eye text-primary" title="View"></i>
-                                        <i class="fa-solid fa-pen-to-square text-warning" title="Edit"></i>
-                                        <i class="fa-solid fa-trash text-danger" title="Delete"></i>
-                                    </td>
-                                </tr>
-                            `;
-                        });
+                // Add new rows
+                tournaments.forEach(t => {
+                    table.row.add([
+                        t.id,
+                        t.name,
+                        t.tournament_mode,
+                        t.entry_fee,
+                        formatDate(t.start_at),
+                        formatDate(t.closed_at),
+                        formatDate(t.result_at),
+                        mapStatus(t.status),
+                        `
+                        <i class="fa-solid fa-eye text-primary" title="View"></i>
+                        <i class="fa-solid fa-pen-to-square text-warning" title="Edit"></i>
+                        <i class="fa-solid fa-trash text-danger" title="Delete"></i>
+                        `
+                    ]);
+                });
 
-                        // Refresh DataTable
-                        table.clear().destroy();
-                        $('#tournamentTable').DataTable({
-                            responsive: true,
-                            pageLength: 5,
-                            lengthMenu: [5, 10, 25, 50],
-                        });
-                    }
-                } catch (err) {
-                    console.error("Error fetching tournaments:", err);
-                    tbody.innerHTML =
-                        `<tr><td colspan="5" class="text-center text-danger">Failed to load data</td></tr>`;
-                }
+                // Redraw DataTable
+                table.draw();
             }
+        } catch (err) {
+            console.error("Error fetching tournaments:", err);
+        }
+    }
 
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let day = date.getDate().toString().padStart(2, "0");
+        let year = date.getFullYear();
+
+        let hours = date.getHours();
+        let minutes = date.getMinutes().toString().padStart(2, "0");
+        let seconds = date.getSeconds().toString().padStart(2, "0");
+        const ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12 || 12;
+
+        return `${month}-${day}-${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
+    }
+
+    function mapStatus(status) {
+    switch (status) {
+        case 0: return "Register Start";
+        case 1: return "Register Close";
+        case 3: return "Publish";
+        default: return status;
+    }
+}
             // Load tournaments on page load
             loadTournaments();
 
