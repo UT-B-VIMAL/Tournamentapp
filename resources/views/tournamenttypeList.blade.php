@@ -132,7 +132,7 @@
 
 
             <div class="table-responsive">
-                <table id="tournamentTable" class="table nowrap" style="width:100%">
+                <table id="tournamentlistTable" class="table nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -183,7 +183,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#tournamentTable').DataTable({
+            $('#tournamentlistTable').DataTable({
                 responsive: true,
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
