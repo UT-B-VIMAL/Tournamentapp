@@ -149,7 +149,8 @@
                             <td>Players, Rounds</td>
                             <td>2025-08-22</td>
                             <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
+                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal"
+                                    data-bs-target="#viewModal"></i>
                                 <i class="fa-solid fa-pen-to-square" title="Edit"></i>
                                 <i class="fa-solid fa-trash" title="Delete"></i>
                             </td>
@@ -160,7 +161,8 @@
                             <td>Teams, Matches</td>
                             <td>2025-08-21</td>
                             <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
+                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal"
+                                    data-bs-target="#viewModal"></i>
                                 <i class="fa-solid fa-pen-to-square" title="Edit"></i>
                                 <i class="fa-solid fa-trash" title="Delete"></i>
                             </td>
@@ -173,36 +175,37 @@
     </div>
 
     <!-- Modal -->
-<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content shadow-lg border-0 rounded-3">
-      
-      <!-- Modal Header -->
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="viewModalLabel">
-          <i class="fa-solid fa-eye"></i> Tournament Details
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <!-- Modal Body -->
-      <div class="modal-body">
-        <p><strong>Name:</strong> Summer Championship</p>
-        <p><strong>Type:</strong> Knockout</p>
-        <p><strong>Start Date:</strong> 25-Aug-2025</p>
-        <p><strong>Status:</strong> Active</p>
-      </div>
-      
-      <!-- Modal Footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          <i class="fa-solid fa-xmark"></i> Close
-        </button>
-      </div>
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content shadow-lg border-0 rounded-3">
 
+                <!-- Modal Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="viewModalLabel">
+                        <i class="fa-solid fa-eye"></i> Tournament Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <p><strong>Name:</strong> Summer Championship</p>
+                    <p><strong>Type:</strong> Knockout</p>
+                    <p><strong>Start Date:</strong> 25-Aug-2025</p>
+                    <p><strong>Status:</strong> Active</p>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> Close
+                    </button>
+                </div>
+
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 @endsection
 
 @section('scripts')
@@ -221,37 +224,78 @@
                 lengthMenu: [5, 10, 25, 50],
             });
 
-            // Example action handlers
-            // $(document).on("click", ".fa-eye", function() {
-            //     alert("View clicked!");
-            // });
-            // $(document).on("click", ".fa-pen-to-square", function() {
-            //     alert("Edit clicked!");
-            // });
+            async function loadTournamentTypes() {
+                const tbody = document.querySelector("#tournamentlistTable tbody");
+
+                // show loader while fetching
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center">Loading...</td></tr>`;
+
+                try {
+                    const response = await apiRequest("", "POST", {
+                        request_type: "get_tournament_type"
+                    });
+
+                    if (response.code === 200 && response.data) {
+                        const tournaments = JSON.parse(response.data); // API gives stringified JSON
+
+                        tbody.innerHTML = ""; // clear previous rows
+
+                        tournaments.forEach(t => {
+                            let variables = t.variables ? `<pre class="mb-0">${t.variables}</pre>` :
+                            "-";
+
+                            let row = `
+                    <tr>
+                        <td>${t.id}</td>
+                        <td>${t.name}</td>
+                        <td>${variables}</td>
+                        <td>${t.created_at ?? '-'}</td>
+                        <td class="table-actions">
+                            <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
+                            <i class="fa-solid fa-pen-to-square" title="Edit"></i>
+                            <i class="fa-solid fa-trash" title="Delete"></i>
+                        </td>
+                    </tr>
+                `;
+
+                            tbody.insertAdjacentHTML("beforeend", row);
+                        });
+                    } else {
+                        tbody.innerHTML =
+                            `<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>`;
+                    }
+                } catch (error) {
+                    console.error("Error loading tournaments:", error);
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" class="text-center text-danger">Failed to fetch data</td></tr>`;
+                }
+            }
+
+
+            // Load tournaments on page load
+            loadTournamentTypes();
 
             $(document).on("click", ".fa-trash", function() {
-          Swal.fire({
-            title: "Are you sure?",
-            text: "Want to delete this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Swal.fire({
-                title: "Deleted!",
-                text: "Your record has been deleted.",
-                icon: "success"
-              });
-              // 👉 Here you can also make an AJAX call to delete from DB
-            }
-          });
-        });
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Want to delete this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: "Your record has been deleted.",
+                            icon: "success"
+                        });
+                        // 👉 Here you can also make an AJAX call to delete from DB
+                    }
+                });
+            });
 
         });
     </script>
 @endsection
-
-
