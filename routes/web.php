@@ -3,13 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('tournament');
+    return view('tournamenttypelist');
 });
 
 Route::get('/tournament', function () {
-    return view('tournament');
-});
-Route::get('/', function () {
     return view('tournament');
 });
 Route::get('/tournamenttypelist', function () {
