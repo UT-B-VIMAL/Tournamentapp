@@ -149,7 +149,7 @@
                             <td>Players, Rounds</td>
                             <td>2025-08-22</td>
                             <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View"></i>
+                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
                                 <i class="fa-solid fa-pen-to-square" title="Edit"></i>
                                 <i class="fa-solid fa-trash" title="Delete"></i>
                             </td>
@@ -160,7 +160,7 @@
                             <td>Teams, Matches</td>
                             <td>2025-08-21</td>
                             <td class="table-actions">
-                                <i class="fa-solid fa-eye" title="View"></i>
+                                <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
                                 <i class="fa-solid fa-pen-to-square" title="Edit"></i>
                                 <i class="fa-solid fa-trash" title="Delete"></i>
                             </td>
@@ -171,6 +171,38 @@
 
         </div>
     </div>
+
+    <!-- Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      
+      <!-- Modal Header -->
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="viewModalLabel">
+          <i class="fa-solid fa-eye"></i> Tournament Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <p><strong>Name:</strong> Summer Championship</p>
+        <p><strong>Type:</strong> Knockout</p>
+        <p><strong>Start Date:</strong> 25-Aug-2025</p>
+        <p><strong>Status:</strong> Active</p>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fa-solid fa-xmark"></i> Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -190,17 +222,34 @@
             });
 
             // Example action handlers
-            $(document).on("click", ".fa-eye", function() {
-                alert("View clicked!");
-            });
-            $(document).on("click", ".fa-pen-to-square", function() {
-                alert("Edit clicked!");
-            });
+            // $(document).on("click", ".fa-eye", function() {
+            //     alert("View clicked!");
+            // });
+            // $(document).on("click", ".fa-pen-to-square", function() {
+            //     alert("Edit clicked!");
+            // });
+
             $(document).on("click", ".fa-trash", function() {
-                if (confirm("Are you sure you want to delete this?")) {
-                    alert("Deleted!");
-                }
-            });
+          Swal.fire({
+            title: "Are you sure?",
+            text: "Want to delete this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: "Deleted!",
+                text: "Your record has been deleted.",
+                icon: "success"
+              });
+              // 👉 Here you can also make an AJAX call to delete from DB
+            }
+          });
+        });
+
         });
     </script>
 @endsection
