@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return view('tournament');
+});
+
 Route::get('/tournament', function () {
     return view('tournament');
 });
