@@ -42,7 +42,7 @@
         
         <!-- Type Label -->
         <div class="mb-3">
-          <label for="typeLabel" class="form-label">Type label</label>
+          <label for="typeLabel" class="form-label">Type</label>
           <input type="text" class="form-control" id="typeLabel" placeholder="Enter type label">
         </div>
         
@@ -176,6 +176,68 @@ $(document).ready(function(){
   $(document).on('click', '.remove-subfield', function(){
     $(this).closest('.row').remove();
   });
+
+   $('#tournamentForm').on('submit', async function (e) {
+        e.preventDefault();
+
+        let typeLabel = $('#typeLabel').val().trim();
+        if (!typeLabel) {
+            alert("Please enter a tournament type name");
+            return;
+        }
+
+        let variables = {}; // Object to hold variables
+
+        $('#variablesContainer .variable-section').each(function () {
+            let varName = $(this).find('.variable-name').val().trim();
+            let varType = $(this).find('.variable-type').val();
+
+            if (!varName || !varType) return;
+
+            if (varType === 'array') {
+                let subArray = [];
+
+                $(this).find('.subfield-list .row').each(function () {
+                    let subName = $(this).find('input').val().trim();
+                    let subType = $(this).find('select').val();
+
+                    if (subName && subType) {
+                        subArray.push({
+                            [subName]: subType
+                        });
+                    }
+                });
+
+                variables[varName] = subArray; // array of objects
+            } else {
+                variables[varName] = varType;
+            }
+        });
+
+        // Build Payload
+        let payload = {
+            request_type: "add_tournament_type",
+            name: typeLabel,
+            variables: JSON.stringify(variables) // API expects string
+        };
+
+        console.log("Payload:", payload);
+
+        try {
+            let response = await apiRequest("", "POST", payload); // common.js
+            console.log("API Response:", response);
+
+            if (response.code === 200) {
+                alert("Tournament type added successfully!");
+                window.location.href = "{{ url('/tournamenttypelist') }}";
+            } else {
+                alert("Failed: " + response.message);
+            }
+        } catch (err) {
+            alert("Error submitting form. Check console.");
+            console.error(err);
+        }
+    });
 
 });
 </script>
