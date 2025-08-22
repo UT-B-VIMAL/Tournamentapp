@@ -205,3 +205,13 @@ $(document).ready(function(){
 });
 </script>
 @endsection
+
+@section('back')
+    <div class="navbar-nav mb-3">
+        <div class="nav-item d-flex">
+            <a class="btn btn-light d-flex align-items-center shadow-sm px-3 rounded-pill" href="{{ url()->previous() }}">
+                &#10094; Back
+            </a>
+        </div>
+    </div>
+@endsection
