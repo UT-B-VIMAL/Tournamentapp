@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title') - Admin Panel</title>
-  <link rel="shortcut icon" type="image/png" href="./assets/images/logos/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="./assets/images/logos/unnamed.png" />
  @yield('styles')
 </head>
 
@@ -40,6 +40,7 @@
       </header>
       <div class="body-wrapper-inner">
         <div class="container-fluid">
+          @yield('back')
           @yield('content')
           @include('layouts.footer')
         </div>
