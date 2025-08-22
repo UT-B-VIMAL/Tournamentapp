@@ -47,7 +47,19 @@
             transition: 0.3s;
         }
 
-        /* Action Icons */
+        table#tournamentlistTable td:nth-child(3) pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow: visible;
+            margin: 0;
+            max-width: 100%;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+
         .table-actions {
             display: flex;
             gap: 12px;
@@ -132,13 +144,12 @@
 
 
             <div class="table-responsive">
-                <table id="tournamentlistTable" class="table nowrap" style="width:100%">
+                <table id="tournamentlistTable" class="table nowrap">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Type</th>
                             <th>Variables</th>
-
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -195,16 +206,9 @@
 
     <script>
         $(document).ready(function() {
-            $('#tournamentlistTable').DataTable({
-                responsive: true,
-                pageLength: 5,
-                lengthMenu: [5, 10, 25, 50],
-            });
-
             async function loadTournamentTypes() {
                 const tbody = document.querySelector("#tournamentlistTable tbody");
 
-                // show loader while fetching
                 tbody.innerHTML = `<tr><td colspan="5" class="text-center">Loading...</td></tr>`;
 
                 try {
@@ -213,13 +217,20 @@
                     });
 
                     if (response.code === 200 && response.data) {
-                        const tournaments = JSON.parse(response.data); // API gives stringified JSON
-
-                        tbody.innerHTML = ""; // clear previous rows
+                        const tournaments = JSON.parse(response.data); // parse outer array
+                        tbody.innerHTML = "";
 
                         tournaments.forEach(t => {
-                            let variables = t.variables ? `<pre class="mb-0">${t.variables}</pre>` :
-                                "-";
+                            let variables = "-";
+                            if (t.variables) {
+                                try {
+                                    const varsObj = JSON.parse(t.variables); // parse inner JSON
+                                    variables =
+                                        `<pre class="mb-0">${JSON.stringify(varsObj, null, 2)}</pre>`; // pretty-print
+                                } catch (e) {
+                                    variables = `<pre class="mb-0">${t.variables}</pre>`; // fallback
+                                }
+                            }
 
                             let row = `
                     <tr>
@@ -227,15 +238,28 @@
                         <td>${t.name}</td>
                         <td>${variables}</td>
                         <td class="table-actions">
-                            <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
+                            <i class="fa-solid fa-eye view-icon" title="View" data-bs-toggle="modal" data-id="${t.id}" data-bs-target="#viewModal"></i>
                             <i class="fa-solid fa-pen-to-square edit-icon" title="Edit" data-id="${t.id}"></i>
-                            <i class="fa-solid fa-trash" title="Delete" data-id="${t.id}"></i>
+                            <i class="fa-solid fa-trash delete-icon" title="Delete" data-id="${t.id}"></i>
                         </td>
                     </tr>
                 `;
 
                             tbody.insertAdjacentHTML("beforeend", row);
                         });
+
+                        $('#tournamentlistTable').DataTable({
+                            responsive: true,
+                            pageLength: 5,
+                            lengthMenu: [5, 10, 25, 50],
+                            destroy: true 
+                            // columnDefs: [{
+                            //         targets: 2,
+                            //         width: '50%'
+                            //     } 
+                            //]
+                        });
+
                     } else {
                         tbody.innerHTML =
                             `<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>`;
@@ -248,6 +272,7 @@
             }
 
 
+
             // Load tournaments on page load
             loadTournamentTypes();
 
@@ -256,7 +281,42 @@
                 window.location.href = `/edit-tournament?id=${id}`;
             });
 
-            $(document).on("click", ".fa-trash", function() {
+            $(document).on("click", ".view-icon", async function() {
+                let id = $(this).data("id");
+
+                try {
+                    // Fetch single tournament data
+                    const response = await apiRequest("", "POST", {
+                        request_type: "get_single_tournament_type",
+                        id: id
+                    });
+
+                    if (response.code === 200 && response.data) {
+                        const t = JSON.parse(response.data);
+
+                        // Fill the modal fields
+                        $('#viewModalLabel').html(`<i class="fa-solid fa-eye"></i> ${t.name} Details`);
+                        $('.modal-body').html(`
+                        <p><strong>Name:</strong> ${t.name}</p>
+                        <p><strong>Variables:</strong> <pre>${t.variables}</pre></p>
+                        <p><strong>Status:</strong> ${t.status === 0 ? 'Inactive' : 'Active'}</p>
+            `);
+
+                        // Show the modal
+                        $('#viewModal').modal('show');
+                    } else {
+                        Swal.fire("Error", response.message || "Failed to fetch tournament", "error");
+                    }
+                } catch (error) {
+                    console.error("Fetch single tournament error:", error);
+                    Swal.fire("Error", "Something went wrong", "error");
+                }
+            });
+
+
+            $(document).on("click", ".delete-icon", function() {
+                let id = $(this).data("id"); // Make sure you add data-id in your delete icon
+
                 Swal.fire({
                     title: "Are you sure?",
                     text: "Want to delete this!",
@@ -265,17 +325,35 @@
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
                     confirmButtonText: "Yes"
-                }).then((result) => {
+                }).then(async (result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({
-                            title: "Deleted!",
-                            text: "Your record has been deleted.",
-                            icon: "success"
-                        });
-                        // 👉 Here you can also make an AJAX call to delete from DB
+                        try {
+                            const response = await apiRequest("", "POST", {
+                                request_type: "delete_tournament_type",
+                                id: id
+                            });
+
+                            if (response.code === 200) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Your record has been deleted.",
+                                    icon: "success"
+                                });
+
+                                // remove row from table
+                                $(this).closest("tr").remove();
+                            } else {
+                                Swal.fire("Failed", response.message || "Something went wrong",
+                                    "error");
+                            }
+                        } catch (error) {
+                            console.error("Delete error:", error);
+                            Swal.fire("Error", "Failed to delete record.", "error");
+                        }
                     }
                 });
             });
+
 
         });
     </script>
