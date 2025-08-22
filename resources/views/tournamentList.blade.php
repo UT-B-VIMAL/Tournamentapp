@@ -121,11 +121,11 @@
     <div class="card shadow">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title fw-semibold mb-0">Tournament Types</h5>
+                <h5 class="card-title fw-semibold mb-0">Tournaments</h5>
 
                 <!-- Add Button (Top Right) -->
-                <a href="{{ url('/tournament') }}" class="btn add-btn">
-                    <i class="fa-solid fa-plus"></i> Add Tournament Type
+                <a href="{{ url('/createTournament') }}" class="btn add-btn">
+                    <i class="fa-solid fa-plus"></i> Add Tournament
                 </a>
             </div>
 
