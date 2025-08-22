@@ -121,18 +121,18 @@
     <div class="card shadow">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title fw-semibold mb-0">Tournament Types</h5>
+                <h5 class="card-title fw-semibold mb-0">Tournament Modes</h5>
 
                 <!-- Add Button (Top Right) -->
-                <a href="{{ url('/tournament') }}" class="btn add-btn">
-                    <i class="fa-solid fa-plus"></i> Add Tournament Type
+                <a href="{{ url('/tournamentMode') }}" class="btn add-btn">
+                    <i class="fa-solid fa-plus"></i> Add Tournament Mode
                 </a>
             </div>
 
 
 
             <div class="table-responsive">
-                <table id="tournamentTable" class="table nowrap" style="width:100%">
+                <table id="tournamentmodeTable" class="table nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -183,7 +183,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#tournamentTable').DataTable({
+            $('#tournamentmodeTable').DataTable({
                 responsive: true,
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
