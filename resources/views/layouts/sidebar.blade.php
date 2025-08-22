@@ -1,7 +1,7 @@
 <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
   <ul id="sidebarnav">
     <li class="sidebar-item">
-      <a class="sidebar-link @if (request()->is('tournament', 'tournamentlist')) active @endif" href="{{ url('/tournamenttypelist') }}" aria-expanded="false">
+      <a class="sidebar-link @if (request()->is('tournament', 'tournamenttypelist')) active @endif" href="{{ url('/tournamenttypelist') }}" aria-expanded="false">
         <i class="ti ti-category"></i>
         <span class="hide-menu">Tournament Types</span>
       </a>

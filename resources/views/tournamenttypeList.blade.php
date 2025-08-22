@@ -227,9 +227,9 @@
                         <td>${t.name}</td>
                         <td>${variables}</td>
                         <td class="table-actions">
-                            <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewModal"></i>
+                            <i class="fa-solid fa-eye view-icon" title="View" data-bs-toggle="modal" data-id="${t.id}" data-bs-target="#viewModal"></i>
                             <i class="fa-solid fa-pen-to-square edit-icon" title="Edit" data-id="${t.id}"></i>
-                            <i class="fa-solid fa-trash" title="Delete" data-id="${t.id}"></i>
+                            <i class="fa-solid fa-trash delete-icon" title="Delete" data-id="${t.id}"></i>
                         </td>
                     </tr>
                 `;
@@ -256,7 +256,42 @@
                 window.location.href = `/edit-tournament?id=${id}`;
             });
 
-            $(document).on("click", ".fa-trash", function() {
+            $(document).on("click", ".view-icon", async function() {
+                let id = $(this).data("id");
+
+                try {
+                    // Fetch single tournament data
+                    const response = await apiRequest("", "POST", {
+                        request_type: "get_single_tournament_type",
+                        id: id
+                    });
+
+                    if (response.code === 200 && response.data) {
+                        const t = JSON.parse(response.data);
+
+                        // Fill the modal fields
+                        $('#viewModalLabel').html(`<i class="fa-solid fa-eye"></i> ${t.name} Details`);
+                        $('.modal-body').html(`
+                        <p><strong>Name:</strong> ${t.name}</p>
+                        <p><strong>Variables:</strong> <pre>${t.variables}</pre></p>
+                        <p><strong>Status:</strong> ${t.status === 0 ? 'Inactive' : 'Active'}</p>
+            `);
+
+                        // Show the modal
+                        $('#viewModal').modal('show');
+                    } else {
+                        Swal.fire("Error", response.message || "Failed to fetch tournament", "error");
+                    }
+                } catch (error) {
+                    console.error("Fetch single tournament error:", error);
+                    Swal.fire("Error", "Something went wrong", "error");
+                }
+            });
+
+
+            $(document).on("click", ".delete-icon", function() {
+                let id = $(this).data("id"); // Make sure you add data-id in your delete icon
+
                 Swal.fire({
                     title: "Are you sure?",
                     text: "Want to delete this!",
@@ -265,17 +300,35 @@
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
                     confirmButtonText: "Yes"
-                }).then((result) => {
+                }).then(async (result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({
-                            title: "Deleted!",
-                            text: "Your record has been deleted.",
-                            icon: "success"
-                        });
-                        // 👉 Here you can also make an AJAX call to delete from DB
+                        try {
+                            const response = await apiRequest("", "POST", {
+                                request_type: "delete_tournament_type",
+                                id: id
+                            });
+
+                            if (response.code === 200) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "Your record has been deleted.",
+                                    icon: "success"
+                                });
+
+                                // remove row from table
+                                $(this).closest("tr").remove();
+                            } else {
+                                Swal.fire("Failed", response.message || "Something went wrong",
+                                    "error");
+                            }
+                        } catch (error) {
+                            console.error("Delete error:", error);
+                            Swal.fire("Error", "Failed to delete record.", "error");
+                        }
                     }
                 });
             });
+
 
         });
     </script>
