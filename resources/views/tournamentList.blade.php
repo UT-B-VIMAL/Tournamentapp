@@ -226,10 +226,9 @@
         case 0: return "Register Start";
         case 1: return "Register Close";
         case 3: return "Publish";
-        default: return status; // fallback if new codes appear
+        default: return status;
     }
 }
-
             // Load tournaments on page load
             loadTournaments();
 
