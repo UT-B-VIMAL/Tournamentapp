@@ -161,10 +161,12 @@
       <div class="modal-body">
         <!-- Tournament details content will be injected dynamically -->
         <div id="tournamentDetails">
-          <p><strong>Name:</strong> Tournament Name</p>
-          <p><strong>Date:</strong> 2025-08-20</p>
-          <p><strong>Mode:</strong> Solo</p>
-          <p><strong>Entry Fee:</strong> ₹100</p>
+        <p><strong>ID:</strong> <span id="tournament_id"></span></p>
+        <p><strong>Name:</strong> <span id="tournament_name"></span></p>
+        <p><strong>Mode:</strong> <span id="tournament_mode"></span></p>
+        <p><strong>Entry Fee:</strong> <span id="tournament_entry_fee"></span></p>
+        <p><strong>Start Time:</strong> <span id="tournament_start_time"></span></p>
+        <p><strong>End Time:</strong> <span id="tournament_end_time"></span></p>
         </div>
       </div>
       <div class="modal-footer">
@@ -192,6 +194,7 @@
             lengthMenu: [5, 10, 25, 50],
         });
 
+        // ✅ Load tournaments list
         async function loadTournaments() {
             try {
                 const response = await apiRequest("", "POST", { request_type: "get_tournament" });
@@ -214,17 +217,19 @@
                             formatDate(t.result_at),
                             mapStatus(t.status),
                             `
-                           <i class="fa-solid fa-eye" title="View" data-bs-toggle="modal" data-bs-target="#viewTournamentModal"></i>
+                            <i class="fa-solid fa-eye text-info" title="View"
+                               onclick="viewTournament(${t.id})"
+                               data-bs-toggle="modal" data-bs-target="#viewTournamentModal"></i>
 
                             <a href="{{ url('edit-tournament') }}/${t.id}">
                                 <i class="fa-solid fa-pen-to-square text-warning" title="Edit"></i>
                             </a>
-                            <i class="fa-solid fa-trash text-danger delete-btn" data-id="${t.id}" style="cursor:pointer;" title="Delete"></i>
+                            <i class="fa-solid fa-trash text-danger delete-btn" data-id="${t.id}"
+                               style="cursor:pointer;" title="Delete"></i>
                             `
                         ]);
                     });
 
-                    // Redraw DataTable
                     table.draw();
                 }
             } catch (err) {
@@ -232,6 +237,7 @@
             }
         }
 
+        // ✅ Format Date
         function formatDate(dateString) {
             const date = new Date(dateString);
             let month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -247,6 +253,7 @@
             return `${month}-${day}-${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
         }
 
+        // ✅ Map Status
         function mapStatus(status) {
             switch (status) {
                 case 0: return "Register Start";
@@ -256,12 +263,36 @@
             }
         }
 
-        // Load tournaments on page load
+        // ✅ Load tournaments on page load
         loadTournaments();
 
-        // Action handlers
+        // ✅ View Tournament Details
+        window.viewTournament = async function (id) {
+            try {
+                const response = await apiRequest("", "POST", {
+                    request_type: "get_single_tournament",
+                    id: id
+                });
 
-        // ✅ Delete with SweetAlert
+                if (response.code === 200 && response.data) {
+                    const t = JSON.parse(response.data); // 🔥 parse data
+
+                    document.getElementById("tournament_id").textContent = t.id;
+                    document.getElementById("tournament_name").textContent = t.name;
+                    document.getElementById("tournament_mode").textContent = t.tournament_mode;
+                    document.getElementById("tournament_entry_fee").textContent = t.entry_fee;
+                    document.getElementById("tournament_start_time").textContent = formatDate(t.start_at);
+                    document.getElementById("tournament_end_time").textContent = formatDate(t.closed_at);
+                } else {
+                    Swal.fire("Error!", "Failed to load tournament details.", "error");
+                }
+            } catch (error) {
+                console.error("Error fetching tournament:", error);
+                Swal.fire("Error!", "Something went wrong while fetching details.", "error");
+            }
+        }
+
+        // ✅ Delete Tournament with SweetAlert
         $(document).on("click", ".delete-btn", async function () {
             const id = $(this).data("id");
 
@@ -280,14 +311,12 @@
                         id: id
                     };
 
-                    console.log("Delete Payload:", payload);
-
                     try {
                         const response = await apiRequest("", "POST", payload);
 
                         if (response.code === 200) {
                             Swal.fire("Deleted!", "Tournament has been deleted.", "success");
-                            loadTournaments(); // 🔄 reload table after delete
+                            loadTournaments(); // 🔄 reload table
                         } else {
                             Swal.fire("Error!", response.message, "error");
                         }
@@ -300,5 +329,6 @@
         });
     });
 </script>
+
 
 @endsection
