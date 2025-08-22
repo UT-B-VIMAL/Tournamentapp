@@ -18,7 +18,6 @@ async function apiRequest(endpoint, method = "GET", data = {}, headers = {}) {
                 ...headers
             }
         });
-alert(response);
         return response.data;
     } catch (error) {
         console.error("API Error:", error.response?.data || error.message);

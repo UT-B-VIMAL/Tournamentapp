@@ -9,6 +9,9 @@ Route::get('/', function () {
 Route::get('/tournament', function () {
     return view('tournament');
 });
+Route::get('/edit-tournament', function () {
+    return view('edit_tournament');
+});
 Route::get('/tournamenttypelist', function () {
     return view('tournamenttypeList');
 });
