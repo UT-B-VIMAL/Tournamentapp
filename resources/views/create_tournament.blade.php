@@ -78,9 +78,6 @@ document.getElementById("tournamentForm").addEventListener("submit", async funct
         result_at: formatDateTime(document.getElementById("result_at").value),
     };
 
-    alert(JSON.stringify(payload));
-    console.log("Payload:", payload);
-
     try {
         const response = await apiRequest("", "POST", payload);
         if (response.code === 200) {
