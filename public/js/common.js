@@ -6,6 +6,7 @@ const API_BASE_URL = document.head.querySelector('meta[name="api-base-url"]').co
 // Make function globally available
 async function apiRequest(endpoint, method = "GET", data = {}, headers = {}) {
     try {
+                
 
         const response = await axios({
             url: `${API_BASE_URL}/${endpoint}`,
@@ -17,7 +18,7 @@ async function apiRequest(endpoint, method = "GET", data = {}, headers = {}) {
                 ...headers
             }
         });
-
+alert(response);
         return response.data;
     } catch (error) {
         console.error("API Error:", error.response?.data || error.message);
