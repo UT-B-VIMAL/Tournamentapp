@@ -24,9 +24,7 @@
             <label for="mode" class="form-label">Mode</label>
             <select name="mode" id="mode" class="form-select" required>
               <option value="">-- Select Mode --</option>
-              <option value="1">Online</option>
-              <option value="2">Offline</option>
-              <option value="3">Hybrid</option>
+            
             </select>
           </div>
 
@@ -91,7 +89,33 @@ document.getElementById("tournamentForm").addEventListener("submit", async funct
         alert("Failed to save tournament");
     }
 });
+async function tournamentModes() {
+    try {
+        const response = await apiRequest("", "POST", { request_type: "get_tournament_mode" });
 
+        if (response.code === 200) {
+            // Parse the JSON string in response.data
+            let tournaments = JSON.parse(response.data);
+
+            // Get the select element
+            let select = document.getElementById("mode");
+
+            // Clear old options except the first
+            select.innerHTML = '<option value="">Select type</option>';
+
+            // Loop and add options
+            tournaments.forEach(t => {
+                let option = document.createElement("option");
+                option.value = t.id;          // you can use id as value
+                option.textContent = t.name;  // show tournament name
+                select.appendChild(option);
+            });
+        }
+    } catch (err) {
+        console.error("Error fetching tournaments:", err);
+    }
+}
+tournamentModes();
 // Format datetime-local → "YYYY-MM-DD HH:mm:ss"
 function formatDateTime(datetimeValue) {
     const date = new Date(datetimeValue);
