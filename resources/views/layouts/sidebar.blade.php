@@ -5,7 +5,7 @@
             <span class="hide-menu">Home</span>
         </li>
     <li class="sidebar-item">
-      <a class="sidebar-link @if (request()->is('tournament', 'tournamenttypelist','edit-tournament')) active @endif" href="{{ url('/tournamenttypelist') }}" aria-expanded="false">
+      <a class="sidebar-link @if (request()->is('/','tournament', 'tournamenttypelist','edit-tournament')) active @endif" href="{{ url('/tournamenttypelist') }}" aria-expanded="false">
         <i class="ti ti-category"></i>
         <span class="hide-menu">Tournament Types</span>
       </a>
