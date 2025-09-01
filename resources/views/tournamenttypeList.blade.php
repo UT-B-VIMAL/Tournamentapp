@@ -278,7 +278,7 @@
 
             $(document).on("click", ".edit-icon", function() {
                 let id = $(this).data("id");
-                window.location.href = `/edit-tournament?id=${id}`;
+                window.location.href = `/edit-tournamenttype?id=${id}`;
             });
 
             $(document).on("click", ".view-icon", async function() {
