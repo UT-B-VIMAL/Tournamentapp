@@ -1,247 +1,160 @@
 @extends('layouts.main')
 
-@section('title', 'Edit Tournament Type')
+@section('title', 'Edit Tournament')
 
 @section('styles')
-   <link rel="stylesheet" href="{{ asset('./assets/css/styles.min.css') }}" />
-   <style>
-    .variable-section {
-      padding: 15px;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      background: #f8f9fa;
-    }
-    .subfields {
-      padding: 12px;
-      margin-top: 10px;
-      border: 1px dashed #adb5bd;
-      border-radius: 6px;
-      background: #ffffff;
-    }
-    .remove-btn {
-      margin-top: 30px;
-    }
-  </style>
+   <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
 @endsection
 
 @section('content')
 <div class="card">
-    <div class="card-body">
-      <h5 class="card-title fw-semibold mb-4">Edit Tournament Type</h5>
-      <form id="tournamentForm">
-        <input type="hidden" id="tournamentId">
+  <div class="card-body">
+    <h5 class="card-title fw-semibold mb-4">Edit Tournament</h5>
+    <div class="card">
+      <div class="card-body">
+        <form id="tournamentForm">
+          {{-- Name --}}
+          <div class="mb-3">
+            <label for="name" class="form-label">Tournament Name</label>
+            <input type="text" name="name" class="form-control" id="name" required>
+          </div>
 
-        <!-- Type Label -->
-        <div class="mb-3">
-          <label for="typeLabel" class="form-label">Type</label>
-          <input type="text" class="form-control" id="typeLabel" placeholder="Enter type label">
-        </div>
-        
-        <h5 class="fw-semibold mb-3">Variables</h5>
-        <div id="variablesContainer"></div>
-        
-        <button type="button" class="btn btn-success mt-3" id="addVariable">Add +</button>
-        <button type="submit" class="btn btn-primary mt-3">Update</button>
-      </form>
+          {{-- Mode --}}
+          <div class="mb-3">
+            <label for="mode" class="form-label">Mode</label>
+            <select name="mode" id="mode" class="form-select" required>
+              <option value="">-- Select Mode --</option>
+              <option value="1">Online</option>
+              <option value="2">Offline</option>
+              <option value="3">Hybrid</option>
+            </select>
+          </div>
+
+          {{-- Entry Fee --}}
+          <div class="mb-3">
+            <label for="entry_fee" class="form-label">Entry Fee</label>
+            <input type="number" name="entry_fee" class="form-control" id="entry_fee" min="0" required>
+          </div>
+
+          {{-- Register Start At --}}
+          <div class="mb-3">
+            <label for="register_start_at" class="form-label">Register Start At</label>
+            <input type="datetime-local" name="register_start_at" class="form-control" id="start_date" required>
+          </div>
+
+          {{-- Register Close At --}}
+          <div class="mb-3">
+            <label for="register_close_at" class="form-label">Register Close At</label>
+            <input type="datetime-local" name="register_close_at" class="form-control" id="closed_at" required>
+          </div>
+
+          {{-- Result At --}}
+          <div class="mb-3">
+            <label for="result_at" class="form-label">Result At</label>
+            <input type="datetime-local" name="result_at" class="form-control" id="result_at" required>
+          </div>
+
+          {{-- Hidden ID for edit --}}
+          <input type="hidden" id="tournament_id" name="tournament_id" value="">
+
+          <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+      </div>
     </div>
   </div>
+</div>
 @endsection
 
 @section('scripts')
+
 <script>
-$(document).ready(function(){
-
-  // -----------------------
-  // Helper functions
-  // -----------------------
-  function createVariable(name = "", type = "") {
-    return `
-      <div class="variable-section">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-5">
-            <label class="form-label">Name</label>
-            <input type="text" class="form-control variable-name" value="${name}" placeholder="Enter name">
-          </div>
-          <div class="col-md-5">
-            <label class="form-label">Type</label>
-            <select class="form-select variable-type">
-              <option value="">Select type</option>
-              <option value="string" ${type==="string"?"selected":""}>String</option>
-              <option value="number" ${type==="number"?"selected":""}>Number</option>
-              <option value="boolean" ${type==="boolean"?"selected":""}>Boolean</option>
-              <option value="array" ${type==="array"?"selected":""}>Array</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button type="button" class="btn btn-danger remove-btn">Remove -</button>
-          </div>
-        </div>
-        <div class="subfields d-none mt-3">
-          <div class="subfield-list"></div>
-          <button type="button" class="btn btn-sm btn-primary mt-2 add-subfield">Add +</button>
-        </div>
-      </div>`;
-  }
-
-  function createSubfield(name = "", type = "") {
-    return `
-      <div class="row g-3 align-items-end mb-2">
-        <div class="col-md-5">
-          <label class="form-label">Sub Name</label>
-          <input type="text" class="form-control" value="${name}" placeholder="Enter sub name">
-        </div>
-        <div class="col-md-5">
-          <label class="form-label">Sub Type</label>
-          <select class="form-select">
-            <option value="">Select type</option>
-            <option value="string" ${type==="string"?"selected":""}>String</option>
-            <option value="number" ${type==="number"?"selected":""}>Number</option>
-            <option value="boolean" ${type==="boolean"?"selected":""}>Boolean</option>
-            <option value="array" ${type==="array"?"selected":""}>Array</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <button type="button" class="btn btn-sm btn-danger remove-subfield">Remove -</button>
-        </div>
-      </div>`;
-  }
-
-  // -----------------------
-  // Dynamic actions
-  // -----------------------
-  $('#addVariable').click(function(){
-    $('#variablesContainer').append(createVariable());
-  });
-
-  $(document).on('click', '.remove-btn', function(){
-    $(this).closest('.variable-section').remove();
-  });
-
-  $(document).on('change', '.variable-type', function(){
-    let section = $(this).closest('.variable-section');
-    if($(this).val() === 'array'){
-      section.find('.subfields').removeClass('d-none');
-      if(section.find('.subfield-list').children().length === 0){
-        section.find('.subfield-list').append(createSubfield());
-      }
-    } else {
-      section.find('.subfields').addClass('d-none').find('.subfield-list').empty();
-    }
-  });
-
-  $(document).on('click', '.add-subfield', function(){
-    $(this).siblings('.subfield-list').append(createSubfield());
-  });
-
-  $(document).on('click', '.remove-subfield', function(){
-    $(this).closest('.row').remove();
-  });
-
-  // -----------------------
-  // Load data for editing
-  // -----------------------
-  async function loadTournamentType(id){
+document.addEventListener("DOMContentLoaded", async function() {
     try {
-      let response = await apiRequest("", "POST", {
-        request_type: "get_single_tournament_type",
-        id: id
-      });
+        const id = "{{ $id }}";
+        console.log("ID:", id);
 
-      if(response.code === 200 && response.data){
-        let data = JSON.parse(response.data);
-        $('#tournamentId').val(data.id);
-        $('#typeLabel').val(data.name);
-
-        let variables = JSON.parse(data.variables);
-        $('#variablesContainer').empty();
-
-        Object.entries(variables).forEach(([key, val]) => {
-          if(Array.isArray(val)){
-            // it's an array type
-            let section = $(createVariable(key, "array"));
-            let list = section.find('.subfield-list');
-            val.forEach(obj => {
-              let subName = Object.keys(obj)[0];
-              let subType = obj[subName];
-              list.append(createSubfield(subName, subType));
-            });
-            section.find('.subfields').removeClass('d-none');
-            $('#variablesContainer').append(section);
-          } else {
-            $('#variablesContainer').append(createVariable(key, val));
-          }
+        // Fetch tournament data
+        const response = await apiRequest("", "POST", {
+            request_type: "get_single_tournament",
+            id: id
         });
-      }
-    } catch (err) {
-      console.error("Error fetching tournament:", err);
-    }
-  }
 
-  // -----------------------
-  // Submit Update
-  // -----------------------
-  $('#tournamentForm').on('submit', async function(e){
+        if (response.code === 200 && response.data) {
+            const tournament = JSON.parse(response.data);
+
+            document.getElementById("tournament_id").value = tournament.id;
+            document.getElementById("name").value = tournament.name;
+            document.getElementById("entry_fee").value = tournament.entry_fee;
+            document.getElementById("mode").value = tournament.tournament_mode;
+
+            document.getElementById("start_date").value = formatDateForInput(tournament.start_at);
+            document.getElementById("closed_at").value = formatDateForInput(tournament.closed_at);
+            document.getElementById("result_at").value = formatDateForInput(tournament.result_at);
+        }
+    } catch (err) {
+        console.error("Error fetching:", err);
+    }
+});
+
+// 🟢 Handle Update Submit
+document.getElementById("tournamentForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    let id = $('#tournamentId').val();
-    let typeLabel = $('#typeLabel').val().trim();
-    if(!typeLabel){
-      alert("Please enter a tournament type name");
-      return;
-    }
-
-    let variables = {};
-    $('#variablesContainer .variable-section').each(function(){
-      let varName = $(this).find('.variable-name').val().trim();
-      let varType = $(this).find('.variable-type').val();
-      if(!varName || !varType) return;
-
-      if(varType === 'array'){
-        let subArray = [];
-        $(this).find('.subfield-list .row').each(function(){
-          let subName = $(this).find('input').val().trim();
-          let subType = $(this).find('select').val();
-          if(subName && subType){
-            subArray.push({ [subName]: subType });
-          }
-        });
-        variables[varName] = subArray;
-      } else {
-        variables[varName] = varType;
-      }
-    });
-
-    let payload = {
-      request_type: "update_tournament_type",
-      id: id,
-      name: typeLabel,
-      variables: JSON.stringify(variables)
+    const payload = {
+        request_type: "update_tournament",
+        id: document.getElementById("tournament_id").value,
+        name: document.getElementById("name").value,
+        tournament_mode: document.getElementById("mode").value,
+        entry_fee: parseInt(document.getElementById("entry_fee").value),
+        start_at: formatDateTime(document.getElementById("start_date").value),
+        closed_at: formatDateTime(document.getElementById("closed_at").value),
+        result_at: formatDateTime(document.getElementById("result_at").value),
     };
 
+    console.log("Update Payload:", payload);
+
     try {
-      let response = await apiRequest("", "POST", payload);
-      if(response.code === 200){
-        alert("Tournament type updated successfully!");
-        window.location.href = "{{ url('/tournamenttypelist') }}";
-      } else {
-        alert("Failed: " + response.message);
-      }
-    } catch(err){
-      console.error(err);
-      alert("Error updating tournament");
+        const response = await apiRequest("", "POST", payload);
+        if (response.code === 200) {
+            alert("Tournament updated successfully!");
+            window.location.href = "{{ url('tournamentlist') }}";
+        } else {
+            alert("Error: " + response.message);
+        }
+    } catch (err) {
+        console.error("API Error:", err);
+        alert("Failed to update tournament");
     }
-  });
-
-  // -----------------------
-  // Get ID from URL and load data
-  // -----------------------
-  const urlParams = new URLSearchParams(window.location.search);
-  const id = urlParams.get('id');
-  if(id){
-    loadTournamentType(id);
-  }
-
 });
+
+// Format API UTC → datetime-local
+function formatDateForInput(dateString) {
+    const date = new Date(dateString);
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+}
+
+// Format datetime-local → MySQL "YYYY-MM-DD HH:mm:ss"
+function formatDateTime(datetimeValue) {
+    const date = new Date(datetimeValue);
+    const year = date.getFullYear();
+    const month = String(date.getMonth()+1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
 </script>
+
+@endsection
+
+@section('back')
+<div class="navbar-nav mb-3">
+    <div class="nav-item d-flex">
+        <a class="btn btn-light d-flex align-items-center shadow-sm px-3 rounded-pill" href="{{ url()->previous() }}">
+            &#10094; Back
+        </a>
+    </div>
+</div>
 @endsection
