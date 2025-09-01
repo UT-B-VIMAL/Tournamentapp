@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="api-base-url" content="{{ config('app.api_base_url') }}">
   <title>@yield('title') - Admin Panel</title>
-  <link rel="shortcut icon" type="image/png" href="./assets/images/logos/unnamed.png" />
+  <link rel="shortcut icon" type="image/png" href="{{ asset('./assets/images/logos/fav.svg') }}" />
 
  @yield('styles')
 </head>
