@@ -13,6 +13,10 @@ Route::get('/edit-tournament/{id}', function ($id) {
     return view('edit_tournament', ['id' => $id]);
 });
 
+Route::get('/edit-tournamenttype', function () {
+    return view('edit_tournamenttype');
+});
+
 Route::get('/tournamenttypelist', function () {
     return view('tournamenttypeList');
 });
