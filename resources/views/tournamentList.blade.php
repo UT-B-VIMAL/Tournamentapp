@@ -133,6 +133,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
+                        <th>Round</th>
                         <th>Tournament Mode</th>
                         <th>Entry Fee</th>
                         <th>Started At</th>
@@ -163,6 +164,7 @@
         <div id="tournamentDetails">
         <p><strong>ID:</strong> <span id="tournament_id"></span></p>
         <p><strong>Name:</strong> <span id="tournament_name"></span></p>
+        <p><strong>Round:</strong> <span id="tournament_round"></span></p>
         <p><strong>Mode:</strong> <span id="tournament_mode"></span></p>
         <p><strong>Entry Fee:</strong> <span id="tournament_entry_fee"></span></p>
         <p><strong>Start Time:</strong> <span id="tournament_start_time"></span></p>
@@ -210,6 +212,7 @@
                         table.row.add([
                             t.id,
                             t.name,
+                            (t.round_name) ? t.round_name : "-",
                             t.tournament_mode,
                             t.entry_fee,
                             formatDate(t.start_at),
@@ -279,6 +282,7 @@
 
                     document.getElementById("tournament_id").textContent = t.id;
                     document.getElementById("tournament_name").textContent = t.name;
+                    document.getElementById("tournament_round").textContent = t.round_name;
                     document.getElementById("tournament_mode").textContent = t.tournament_mode;
                     document.getElementById("tournament_entry_fee").textContent = t.entry_fee;
                     document.getElementById("tournament_start_time").textContent = formatDate(t.start_at);
