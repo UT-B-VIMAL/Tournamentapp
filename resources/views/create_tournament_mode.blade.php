@@ -37,7 +37,7 @@
 @section('content')
 <div class="card">
     <div class="card-body">
-      <h5 class="card-title fw-semibold mb-4">Add Tournament Type</h5>
+      <h5 class="card-title fw-semibold mb-4">Add Tournament Mode</h5>
       <form id="tournamentForm">
         
         <!-- Type Label -->
@@ -57,7 +57,6 @@
         <h5 class="fw-semibold mb-3 mt-4 variable-lable"></h5>
         <div id="variablesContainer"></div>
         
-        <!-- <button type="button" class="btn btn-success mt-3" id="addVariable">Add Variable +</button> -->
         <button type="submit" class="btn btn-primary mt-3">Submit</button>
       </form>
     </div>
@@ -69,19 +68,25 @@
 <script>
 $(document).ready(function(){
 
-  // Function to generate variable section
-  // Function to generate variable section
+// Variable section generator
 function createVariable(){
   return `
     <div class="variable-section">
       <div class="row g-3 align-items-end">
-        <div class="col-md-5">
+        <div class="col-md-4">
           <label class="form-label">Name</label>
           <input type="text" class="form-control var-name" placeholder="Enter name">
         </div>
-        <div class="col-md-5 var-value">
+        <div class="col-md-4 var-value">
           <label class="form-label">Value</label>
           <input type="text" class="form-control var-value" placeholder="Enter Value">
+        </div>
+        <div class="col-md-3 simple-status">
+          <label class="form-label d-block">Status</label>
+          <div class="form-check form-switch">
+            <input class="form-check-input var-status" type="checkbox" checked>
+            <label class="form-check-label">Enabled</label>
+          </div>
         </div>
       </div>
       <div class="subfields d-none mt-3">
@@ -91,14 +96,13 @@ function createVariable(){
     </div>`;
 }
 
-// Function to generate subfield dynamically from an object
+// Subfield row generator
 function createSubfield(obj = {}) {
   let html = `<div class="row g-3 align-items-end mb-2 subfield-row">`;
 
-  // Loop through each key in the object
   Object.keys(obj).forEach(key => {
     html += `
-      <div class="col-md-5">
+      <div class="col-md-4">
         <label class="form-label">${key}</label>
         <input type="text" class="form-control sub-field" 
                data-key="${key}" value="" placeholder="Enter value">
@@ -106,7 +110,15 @@ function createSubfield(obj = {}) {
     `;
   });
 
+  // Status switch per subfield record
   html += `
+    <div class="col-md-2">
+      <label class="form-label d-block">Status</label>
+      <div class="form-check form-switch">
+        <input class="form-check-input subfield-status" type="checkbox" checked>
+        <label class="form-check-label">Enabled</label>
+      </div>
+    </div>
     <div class="col-md-2">
       <button type="button" class="btn btn-sm btn-danger remove-subfield">X</button>
     </div>
@@ -118,41 +130,21 @@ function createSubfield(obj = {}) {
 // Handle Add Subfield button
 $(document).on('click', '.add-subfield', function(){
   let subList = $(this).siblings('.subfield-list');
-
-  // Find the first existing subfield-row in this variable
   let firstRow = subList.find('.subfield-row').first();
-
   if(firstRow.length){
-    // Clone it
     let newRow = firstRow.clone();
-
-    // Clear all values in inputs
-    newRow.find('input').val('');
-
+    newRow.find('input[type=text]').val('');
+    newRow.find('.subfield-status').prop('checked', true);
     subList.append(newRow);
   }
 });
 
+// Remove subfield
+$(document).on('click', '.remove-subfield', function(){
+  $(this).closest('.row').remove();
+});
 
-
-  // // Add new variable
-  // $('#addVariable').click(function(){
-  //   $('#variablesContainer').append(createVariable());
-  // });
-
-  // Remove variable
-  $(document).on('click', '.remove-btn', function(){
-    $(this).closest('.variable-section').remove();
-  });
-
-
-
-  // Remove subfield
-  $(document).on('click', '.remove-subfield', function(){
-    $(this).closest('.row').remove();
-  });
-
-  // Bind API Response
+// Bind API Response
 function bindApiResponse(data) {
   $('.variable-lable').empty();
   $('#variablesContainer').empty();
@@ -162,24 +154,22 @@ function bindApiResponse(data) {
     variableSection.find('.var-name').val(key);
 
     if (Array.isArray(value)) {
+      // hide simple value & simple status
       variableSection.find('.subfields').removeClass('d-none');
-      variableSection.find('.var-value').prop('hidden', true).val('');
-      let subList = variableSection.find('.subfield-list');
+      variableSection.find('.var-value').prop('hidden', true);
+      variableSection.find('.simple-status').prop('hidden', true);
 
+      let subList = variableSection.find('.subfield-list');
       value.forEach(item => {
-        // Pass the whole object so all keys are rendered
         let subfield = $(createSubfield(item));
         subList.append(subfield);
       });
-    } else {
-      // variableSection.find('.var-value').val(value);
     }
     $('#variablesContainer').append(variableSection);
   });
 }
 
-  // Example API Response
-// On tournament type change -> fetch variables from API
+// Tournament type change
 $('#tournamentType').on('change', async function () {
     let selectedId = $(this).val();
     if (!selectedId) {
@@ -195,13 +185,8 @@ $('#tournamentType').on('change', async function () {
         });
 
         if (response.code === 200) {
-            // First parse the wrapper object
             let parsed = JSON.parse(response.data);
-
-            // Then parse variables string
             let variables = JSON.parse(parsed.variables);
-
-            // Bind into form
             bindApiResponse(variables);
         }
     } catch (err) {
@@ -209,17 +194,13 @@ $('#tournamentType').on('change', async function () {
     }
 });
 
-
-  // Serialize form back to JSON
- // Serialize form back to JSON and send to API
-// Serialize form back to JSON and send to API
+// Form submit
 $('#tournamentForm').submit(async function(e){
     e.preventDefault();
 
     let modeLabel = $('#modeLabel').val().trim();
     let tournamentType = $('#tournamentType').val();
 
-    // Validation
     if (!modeLabel) {
         alert("Mode Label is required!");
         return;
@@ -240,7 +221,7 @@ $('#tournamentForm').submit(async function(e){
         if (!key) {
             alert("Variable name cannot be empty!");
             valid = false;
-            return false; // break loop
+            return false;
         }
 
         if(subfields.length > 0){
@@ -253,14 +234,15 @@ $('#tournamentForm').submit(async function(e){
                     if(!val){
                         alert("All subfield values are required!");
                         hasEmpty = true;
-                        return false; // break inner loop
+                        return false;
                     }
                     obj[$(this).data('key')] = val;
                 });
                 if(hasEmpty){
                     valid = false;
-                    return false; // break subfields loop
+                    return false;
                 }
+                obj["status"] = $(this).find('.subfield-status').is(':checked') ? 1 : 0;
                 arr.push(obj);
             });
             result[key] = arr;
@@ -269,15 +251,15 @@ $('#tournamentForm').submit(async function(e){
             if(!val){
                 alert("Value is required for variable: " + key);
                 valid = false;
-                return false; // break loop
+                return false;
             }
-            result[key] = val;
+            let status = $(this).find('.var-status').is(':checked') ? 1 : 0;
+            result[key] = { status: status, value: val };
         }
     });
 
     if (!valid) return;
 
-    // Build the payload
     let payload = {
         request_type: "add_tournament_mode",
         name: modeLabel,
@@ -292,7 +274,6 @@ $('#tournamentForm').submit(async function(e){
 
         if(response.code === 200){
             alert("Tournament mode added successfully!");
-            // Reset form
             $('#tournamentForm')[0].reset();
             $('#variablesContainer').empty();
             $('.variable-lable').empty();
@@ -305,29 +286,21 @@ $('#tournamentForm').submit(async function(e){
     }
 });
 
-
-
 });
 
+// Load tournament types
 async function tournamentTypes() {
     try {
         const response = await apiRequest("", "POST", { request_type: "get_tournament_type" });
 
         if (response.code === 200) {
-            // Parse the JSON string in response.data
             let tournaments = JSON.parse(response.data);
-
-            // Get the select element
             let select = document.getElementById("tournamentType");
-
-            // Clear old options except the first
             select.innerHTML = '<option value="">Select type</option>';
-
-            // Loop and add options
             tournaments.forEach(t => {
                 let option = document.createElement("option");
-                option.value = t.id;          // you can use id as value
-                option.textContent = t.name;  // show tournament name
+                option.value = t.id;
+                option.textContent = t.name;
                 select.appendChild(option);
             });
         }
@@ -336,9 +309,7 @@ async function tournamentTypes() {
     }
 }
 
-// Load on page ready
 tournamentTypes();
-
 </script>
 @endsection
 
