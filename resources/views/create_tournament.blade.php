@@ -115,6 +115,9 @@ document.getElementById("tournamentForm").addEventListener("submit", async funct
     const payload = {
         request_type: "add_tournament",
         name: document.getElementById("name").value,
+        created_by: "172.31.4.234",
+        game_name: "TeerShillong",
+        operator: "rumblebets",
         tournament_mode: document.getElementById("mode").value,
         entry_fee: parseInt(document.getElementById("entry_fee").value),
         rounds: JSON.stringify(rounds)
