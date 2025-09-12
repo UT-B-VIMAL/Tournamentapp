@@ -211,7 +211,7 @@
                     tournaments.forEach(t => {
                         table.row.add([
                             t.id,
-                            t.name,
+                            t.tournament_name,
                             (t.round_name) ? t.round_name : "-",
                             t.tournament_mode,
                             t.entry_fee,
