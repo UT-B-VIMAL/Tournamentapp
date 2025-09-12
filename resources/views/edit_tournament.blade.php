@@ -68,6 +68,33 @@
 @section('scripts')
 
 <script>
+  async function tournamentModes() {
+    try {
+        const response = await apiRequest("", "POST", { request_type: "get_tournament_mode" });
+
+        if (response.code === 200) {
+            // Parse the JSON string in response.data
+            let tournaments = JSON.parse(response.data);
+
+            // Get the select element
+            let select = document.getElementById("mode");
+
+            // Clear old options except the first
+            select.innerHTML = '<option value="">Select type</option>';
+
+            // Loop and add options
+            tournaments.forEach(t => {
+                let option = document.createElement("option");
+                option.value = t.id;          // you can use id as value
+                option.textContent = t.name;  // show tournament name
+                select.appendChild(option);
+            });
+        }
+    } catch (err) {
+        console.error("Error fetching tournaments:", err);
+    }
+}
+tournamentModes();
 document.addEventListener("DOMContentLoaded", async function() {
     try {
         const id = "{{ $id }}";
@@ -104,6 +131,9 @@ document.getElementById("tournamentForm").addEventListener("submit", async funct
         request_type: "update_tournament",
         id: document.getElementById("tournament_id").value,
         name: document.getElementById("name").value,
+        created_by: "172.31.4.234",
+        game_name: "TeerShillong",
+        operator: "rumblebets",
         tournament_mode: document.getElementById("mode").value,
         entry_fee: parseInt(document.getElementById("entry_fee").value),
         start_at: formatDateTime(document.getElementById("start_date").value),
