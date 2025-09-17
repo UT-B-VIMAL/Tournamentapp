@@ -137,7 +137,6 @@
                             <th>Name</th>
                             <th>Tournament Type</th>
                             <th>Details</th>
-                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -219,7 +218,6 @@
                         t.name,
                         t.tournament_type,
                         `<span title="${dataTooltip}">${dataPreview}</span>`,
-                        t.status == 0 ? 'Inactive' : 'Active',
                         `<div class="table-actions">
                             <i class="fa-solid fa-eye view-icon" title="View" data-bs-toggle="modal" data-id="${t.id}" data-bs-target="#viewModal"></i>
                             <a href="/edit-tournament-mode/${t.id}"><i class="fa-solid fa-pen-to-square" title="Edit"></i></a>
@@ -299,7 +297,6 @@
                         <p><strong>Name:</strong> ${t.name}</p>
                         <p><strong>Tournament Type</strong> ${t.tournament_type_name}</p>
                         <p><strong>Data:</strong> ${t.data}</p>
-                        <p><strong>Status:</strong> ${t.status === 0 ? 'Inactive' : 'Active'}</p>
                     `);
 
                         // Show the modal
